@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-3d.js"></script>
+    <script src="https://code.highcharts.com/modules/cylinder.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script src="https://code.highcharts.com/modules/drilldown.js"></script>
+    <title>Indicadores de Mantenimiento</title>
+</head>
+<body>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-3d.js"></script>
+<script src="https://code.highcharts.com/modules/cylinder.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script src="https://code.highcharts.com/modules/drilldown.js"></script>
+
+
+
+<figure class="highcharts-figure">
+    <div id="container"></div>
+    
+   
+</figure>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('http://localhost:8004/gr2prueba')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Data received from the backend:', data);
+
+            const dataQ1 = data.map(yearData => ({
+                name: yearData.PROD_YEAR.toString(),
+                y: yearData.total_qty01,
+                drilldown: yearData.PROD_YEAR.toString()+" Q1"
+            }));
+
+            const dataQ2 = data.map(yearData => ({
+                name: yearData.PROD_YEAR.toString(),
+                y: yearData.total_qty02,
+                drilldown: yearData.PROD_YEAR.toString() +" Q2"
+            }));
+
+            const dataQ3 = data.map(yearData => ({
+                name: yearData.PROD_YEAR.toString(),
+                y: yearData.total_res,
+                drilldown: yearData.PROD_YEAR.toString() + +" RES"
+            }));
+
+            const drilldownSeriesQ1 = data.map(yearData => ({
+                name: 'Año: ' + yearData.PROD_YEAR,
+                id: yearData.PROD_YEAR.toString()+ " Q1",
+                data: yearData.monthly_dataQ1.map(monthData => [
+                    'Mes: ' + monthData.PROD_PER, monthData.total_qty01
+                ])
+            }));
+
+            const drilldownSeriesQ2 = data.map(yearData => ({
+                name: ' Año:' + yearData.PROD_YEAR,
+                id: yearData.PROD_YEAR.toString()+" Q2",
+                data: yearData.monthly_dataQ2.map(monthData => [
+                    'Mes: ' + monthData.PROD_PER, monthData.total_qty02
+                ])
+            }));
+
+            const drilldownSeriesRES = data.map(yearData => ({
+                name: 'Año: ' + yearData.PROD_YEAR,
+                id: yearData.PROD_YEAR.toString()+" RES",
+                data: yearData.monthly_dataQ3.map(monthData => [
+                    'Mes: ' + monthData.PROD_PER, monthData.total_res
+                ])
+            }));
+
+
+
+            Highcharts.chart('container', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Gecelca KPI QTY01 '
+                },
+                xAxis: {
+                    type: 'category'
+                },
+                yAxis: {
+                    title: {
+                        text: 'Total'
+                    }
+                },
+                legend: {
+                    enabled: false
+                },
+                plotOptions: {
+                    series: {
+                        borderWidth: 0,
+                        dataLabels: {
+                            enabled: true
+                        }
+                    }
+                },
+                series: [{
+                    name: 'Q1',
+                    colorByPoint: true,
+                    data: dataQ1
+                },
+                {
+                    name: 'Resultado',
+                    colorByPoint: true,
+                    data: dataQ3
+                }],
+                drilldown: {
+                    allowPointDrilldown: false,
+                    series: drilldownSeriesQ1
+                },
+                
+            });
+        
+    })
+    .catch(error => console.error('Error fetching data:', error));
+    
+        
+    })
+
+    
+    </script>
+</body>
+</html>
+
+
+
+
